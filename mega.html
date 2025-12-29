@@ -6,7 +6,6 @@
     <title>Conferidor Mega Sena</title>
     <style>
         :root {
-            /* Tema Escuro (Padrão) */
             --bg-color: #121212;
             --card-bg: #1e1e1e;
             --text-color: #e0e0e0;
@@ -14,19 +13,16 @@
             --header-bg: #2c2c2c;
             --input-bg: #333;
             --border-color: #444;
-            
-            /* Cores Funcionais */
-            --quadra: #ff9800; /* Laranja */
-            --quina: #9c27b0; /* Roxo */
-            --sena: #00e676; /* Verde */
+            --quadra: #ff9800;
+            --quina: #9c27b0;
+            --sena: #00e676;
             --ball-bg: #333;
             --ball-text: #fff;
-            --ball-match: #fdd835; /* Dourado */
+            --ball-match: #fdd835;
             --ball-match-text: #000;
             --shadow: rgba(0,0,0,0.5);
         }
 
-        /* Tema Claro */
         body.light-theme {
             --bg-color: #f0f2f5;
             --card-bg: #ffffff;
@@ -35,23 +31,20 @@
             --header-bg: #ffffff;
             --input-bg: #f0f2f5;
             --border-color: #ccc;
-            
             --ball-bg: #e4e6eb;
             --ball-text: #050505;
             --shadow: rgba(0,0,0,0.1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 0;
-            padding-bottom: 80px;
-            transition: background-color 0.3s, color 0.3s;
+            padding-bottom: 50px;
+            transition: 0.3s;
         }
 
-        /* --- Header --- */
         header {
             background-color: var(--header-bg);
             padding: 15px;
@@ -60,30 +53,20 @@
             z-index: 100;
             box-shadow: 0 2px 10px var(--shadow);
             border-bottom: 1px solid var(--border-color);
-            transition: background-color 0.3s;
         }
 
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         h1 { margin: 0; font-size: 1.1rem; }
 
-        /* Botão de Tema */
         #theme-toggle {
             background: none;
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            font-size: 1.2rem;
-            padding: 5px 10px;
+            padding: 8px 15px;
             border-radius: 20px;
             cursor: pointer;
         }
 
-        /* Input Área */
         .input-group { display: flex; gap: 10px; }
 
         input[type="number"] {
@@ -95,33 +78,29 @@
             background: var(--input-bg);
             color: var(--text-color);
             text-align: center;
-            outline: none;
         }
 
-        button.add-btn {
+        .add-btn {
             background-color: var(--sena);
             color: #000;
             border: none;
             padding: 0 25px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 1.2rem;
-            cursor: pointer;
+            font-size: 1.5rem;
         }
 
-        /* --- Bolas Sorteadas --- */
         #drawn-numbers-container {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             margin-top: 15px;
             justify-content: center;
-            min-height: 40px;
         }
 
         .drawn-ball {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background-color: var(--ball-match);
             color: var(--ball-match-text);
@@ -129,29 +108,12 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             cursor: pointer;
-            animation: popIn 0.3s ease;
         }
 
-        /* --- Status Bar --- */
-        .stats-bar {
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 10px;
-            padding: 5px;
-            border-radius: 4px;
-        }
+        .stats-bar { text-align: center; font-size: 0.85rem; color: var(--text-secondary); margin-top: 10px; }
 
-        /* --- Lista de Jogos --- */
-        #games-list {
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        #games-list { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
 
         .game-card {
             background-color: var(--card-bg);
@@ -159,23 +121,11 @@
             border-radius: 10px;
             border-left: 5px solid var(--border-color);
             box-shadow: 0 2px 5px var(--shadow);
-            transition: all 0.3s ease;
         }
 
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
+        .game-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
 
-        .game-numbers {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
+        .game-numbers { display: flex; flex-wrap: wrap; gap: 8px; }
 
         .ball {
             width: 32px;
@@ -186,74 +136,43 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.85rem;
         }
 
         .ball.hit {
             background-color: var(--ball-match);
             color: var(--ball-match-text);
             font-weight: bold;
-            transform: scale(1.15);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transform: scale(1.1);
         }
 
-        /* --- Premiações --- */
-        .game-card.win-4 { border-left-color: var(--quadra); }
-        .game-card.win-5 { border-left-color: var(--quina); }
-        .game-card.win-6 { border-left-color: var(--sena); }
+        .win-4 { border-left-color: var(--quadra); background: rgba(255,152,0,0.05); }
+        .win-5 { border-left-color: var(--quina); background: rgba(156,39,176,0.05); }
+        .win-6 { border-left-color: var(--sena); background: rgba(0,230,118,0.05); }
 
-        /* Destaque leve no fundo para premiados no modo claro/escuro */
-        body:not(.light-theme) .game-card.win-4 { background: linear-gradient(90deg, rgba(255,152,0,0.1), transparent); }
-        body:not(.light-theme) .game-card.win-5 { background: linear-gradient(90deg, rgba(156,39,176,0.1), transparent); }
-        body:not(.light-theme) .game-card.win-6 { background: linear-gradient(90deg, rgba(0,230,118,0.1), transparent); }
-        
-        body.light-theme .game-card.win-4 { background: #fff8e1; }
-        body.light-theme .game-card.win-5 { background: #f3e5f5; }
-        body.light-theme .game-card.win-6 { background: #e8f5e9; }
-
-        .badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: #fff;
-            font-weight: bold;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            display: none;
-        }
+        .badge { padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 0.7rem; display: none; }
         .win-4 .badge { display: inline; background: var(--quadra); }
         .win-5 .badge { display: inline; background: var(--quina); }
         .win-6 .badge { display: inline; background: var(--sena); }
 
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-        
-        #error-msg {
-            color: #ff5252;
-            text-align: center;
-            padding: 20px;
-            display: none;
-            font-size: 0.9rem;
-            background: rgba(255, 82, 82, 0.1);
-            margin: 10px;
-            border-radius: 8px;
-        }
+        #error-msg { color: #ff5252; padding: 20px; text-align: center; display: none; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="header-top">
-        <h1>Conferidor Ao Vivo</h1>
-        <button id="theme-toggle" onclick="toggleTheme()">☀</button>
+        <h1>Mega Sena Live</h1>
+        <button id="theme-toggle">☀ Tema</button>
     </div>
     
     <div class="input-group">
-        <input type="number" id="numInput" placeholder="Nº Sorteado" inputmode="numeric" pattern="[0-9]*">
-        <button class="add-btn" onclick="addNumber()">+</button>
+        <input type="number" id="numInput" placeholder="Nº Sorteado" inputmode="numeric">
+        <button class="add-btn" id="addBtn">+</button>
     </div>
     
     <div id="drawn-numbers-container"></div>
-    <div class="stats-bar" id="stats-info">Carregando CSV...</div>
+    <div class="stats-bar" id="stats-info">Iniciando...</div>
 </header>
 
 <main>
@@ -262,195 +181,127 @@
 </main>
 
 <script>
-    let games = []; 
-    let drawnNumbers = []; 
+    // Variáveis Globais
+    let games = [];
+    let drawnNumbers = [];
 
-    // Elementos
-    const gamesListEl = document.getElementById('games-list');
-    const drawnContainer = document.getElementById('drawn-numbers-container');
-    const numInput = document.getElementById('numInput');
-    const statsInfo = document.getElementById('stats-info');
-    const errorMsg = document.getElementById('error-msg');
-    const themeBtn = document.getElementById('theme-toggle');
-
-    // 1. Inicialização
-    window.onload = function() {
-        loadTheme();
-        loadCSV();
-    };
-
-    // --- Lógica de Tema ---
+    // --- FUNÇÕES DE INTERFACE ---
     function toggleTheme() {
         document.body.classList.toggle('light-theme');
         const isLight = document.body.classList.contains('light-theme');
-        themeBtn.textContent = isLight ? '☾' : '☀';
-        localStorage.setItem('megasena-theme', isLight ? 'light' : 'dark');
-    }
-
-    function loadTheme() {
-        const savedTheme = localStorage.getItem('megasena-theme');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-theme');
-            themeBtn.textContent = '☾';
-        } else {
-            themeBtn.textContent = '☀';
-        }
-    }
-
-    // --- Lógica CSV ---
-    function loadCSV() {
-        // Cache busting para pegar arquivo atualizado
-        fetch('./jogos.csv?t=' + new Date().getTime())
-            .then(response => {
-                if (!response.ok) throw new Error("Erro 404");
-                return response.text();
-            })
-            .then(text => parseCSV(text))
-            .catch(err => {
-                console.error(err);
-                statsInfo.textContent = "Erro de leitura.";
-                errorMsg.style.display = 'block';
-                errorMsg.innerHTML = `<strong>Erro ao abrir jogos.csv</strong><br>Certifique-se que o arquivo está na pasta e use um servidor local (ou VSCode Live Server).`;
-            });
-    }
-
-    function parseCSV(text) {
-        const lines = text.split('\n');
-        games = [];
-
-        // Detecta cabeçalho
-        let startIndex = 0;
-        if (lines[0] && lines[0].toLowerCase().includes('jogador')) {
-            startIndex = 1;
-        }
-
-        let gameCounter = 1;
-
-        for (let i = startIndex; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (!line) continue;
-
-            const cols = line.split(',');
-            // cols[0] = nome (ignoramos na exibição), cols[1] = qtd
-            // Pegamos de cols[2] em diante
-            const numbers = cols.slice(2)
-                .map(n => parseInt(n.trim()))
-                .filter(n => !isNaN(n));
-
-            if (numbers.length > 0) {
-                games.push({
-                    originalIndex: gameCounter++,
-                    count: cols[1]?.trim() || '?', 
-                    numbers: numbers,
-                    hits: 0
-                });
-            }
-        }
-
-        statsInfo.textContent = `${games.length} jogos carregados.`;
-        errorMsg.style.display = 'none';
-        renderGames();
-    }
-
-    // --- Lógica do Jogo ---
-    function addNumber() {
-        const val = parseInt(numInput.value);
-        if (!val || isNaN(val)) return;
-
-        if (val < 1 || val > 60) { alert("Digite entre 1 e 60"); return; }
-        if (drawnNumbers.includes(val)) { alert("Número repetido!"); numInput.value=''; return; }
-
-        drawnNumbers.push(val);
-        numInput.value = '';
-        numInput.focus();
-
-        renderDrawnNumbers();
-        checkWinners();
-    }
-
-    function removeNumber(val) {
-        if(confirm(`Remover ${val}?`)) {
-            drawnNumbers = drawnNumbers.filter(n => n !== val);
-            renderDrawnNumbers();
-            checkWinners();
-        }
+        document.getElementById('theme-toggle').textContent = isLight ? '☾ Escuro' : '☀ Claro';
+        localStorage.setItem('mega-theme', isLight ? 'light' : 'dark');
     }
 
     function renderDrawnNumbers() {
-        drawnContainer.innerHTML = '';
+        const container = document.getElementById('drawn-numbers-container');
+        container.innerHTML = '';
         drawnNumbers.forEach(num => {
             const el = document.createElement('div');
             el.className = 'drawn-ball';
             el.textContent = num < 10 ? '0'+num : num;
-            el.onclick = () => removeNumber(num);
-            drawnContainer.appendChild(el);
+            el.onclick = () => {
+                drawnNumbers = drawnNumbers.filter(n => n !== num);
+                updateUI();
+            };
+            container.appendChild(el);
         });
-    }
-
-    function checkWinners() {
-        // Conta acertos
-        games.forEach(game => {
-            const matches = game.numbers.filter(n => drawnNumbers.includes(n));
-            game.hits = matches.length;
-        });
-
-        // Ordena: Mais acertos primeiro
-        games.sort((a, b) => b.hits - a.hits);
-
-        // Stats
-        const w6 = games.filter(g => g.hits >= 6).length;
-        const w5 = games.filter(g => g.hits === 5).length;
-        const w4 = games.filter(g => g.hits === 4).length;
-
-        let status = '';
-        if(w6) status += ` SENA: ${w6} 🏆`;
-        else if(w5) status += ` QUINA: ${w5} 🔥`;
-        else if(w4) status += ` QUADRA: ${w4} 👍`;
-        else status = `Jogos: ${games.length} | Sorteados: ${drawnNumbers.length}`;
-
-        statsInfo.textContent = status;
-        renderGames();
     }
 
     function renderGames() {
-        gamesListEl.innerHTML = '';
+        const list = document.getElementById('games-list');
+        list.innerHTML = '';
 
         games.forEach(game => {
-            let cssClass = '';
+            let winClass = '';
             let badgeTxt = '';
-            
-            if (game.hits >= 6) { cssClass = 'win-6'; badgeTxt = 'SENA'; }
-            else if (game.hits === 5) { cssClass = 'win-5'; badgeTxt = 'QUINA'; }
-            else if (game.hits === 4) { cssClass = 'win-4'; badgeTxt = 'QUADRA'; }
+            if (game.hits >= 6) { winClass = 'win-6'; badgeTxt = 'SENA'; }
+            else if (game.hits === 5) { winClass = 'win-5'; badgeTxt = 'QUINA'; }
+            else if (game.hits === 4) { winClass = 'win-4'; badgeTxt = 'QUADRA'; }
 
-            let ballsHtml = game.numbers.map(n => {
+            const ballsHtml = game.numbers.map(n => {
                 const isHit = drawnNumbers.includes(n);
-                const val = n < 10 ? '0'+n : n;
-                return `<div class="ball ${isHit ? 'hit' : ''}">${val}</div>`;
+                return `<div class="ball ${isHit ? 'hit' : ''}">${n < 10 ? '0'+n : n}</div>`;
             }).join('');
 
-            // Aqui substituimos o nome pelo ID sequencial
             const html = `
-                <div class="game-card ${cssClass}">
+                <div class="game-card ${winClass}">
                     <div class="game-header">
-                        <strong>Jogo #${game.originalIndex}</strong>
+                        <strong>Jogo #${game.id}</strong>
                         <span class="badge">${badgeTxt}</span>
-                        <span>Acertos: <strong>${game.hits}</strong></span>
+                        <span>Acertos: <b>${game.hits}</b></span>
                     </div>
                     <div class="game-numbers">${ballsHtml}</div>
-                </div>
-            `;
-            gamesListEl.insertAdjacentHTML('beforeend', html);
+                </div>`;
+            list.insertAdjacentHTML('beforeend', html);
         });
     }
 
-    numInput.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            addNumber();
+    function updateUI() {
+        games.forEach(g => g.hits = g.numbers.filter(n => drawnNumbers.includes(n)).length);
+        games.sort((a, b) => b.hits - a.hits);
+        
+        const w4 = games.filter(g => g.hits === 4).length;
+        const w5 = games.filter(g => g.hits === 5).length;
+        const w6 = games.filter(g => g.hits >= 6).length;
+
+        document.getElementById('stats-info').textContent = 
+            `Jogos: ${games.length} | Quadras: ${w4} | Quinas: ${w5} | Senas: ${w6}`;
+        
+        renderDrawnNumbers();
+        renderGames();
+    }
+
+    function addNumber() {
+        const input = document.getElementById('numInput');
+        const val = parseInt(input.value);
+        if (val >= 1 && val <= 60 && !drawnNumbers.includes(val)) {
+            drawnNumbers.push(val);
+            input.value = '';
+            updateUI();
         }
+        input.focus();
+    }
+
+    // --- CARREGAMENTO DO CSV ---
+    async function loadCSV() {
+        try {
+            const resp = await fetch('./jogos.csv?v=' + Date.now());
+            if (!resp.ok) throw new Error();
+            const text = await resp.text();
+            
+            const lines = text.split('\n');
+            let startIndex = (lines[0].toLowerCase().includes('jogador')) ? 1 : 0;
+            
+            games = [];
+            for (let i = startIndex; i < lines.length; i++) {
+                const cols = lines[i].split(',');
+                if (cols.length < 3) continue;
+                
+                const nums = cols.slice(2).map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                if (nums.length > 0) {
+                    games.push({ id: games.length + 1, numbers: nums, hits: 0 });
+                }
+            }
+            document.getElementById('stats-info').textContent = `Pronto: ${games.length} jogos.`;
+            renderGames();
+        } catch (e) {
+            document.getElementById('error-msg').style.display = 'block';
+            document.getElementById('error-msg').innerHTML = "<b>Erro ao carregar jogos.csv</b><br>Certifique-se que o arquivo existe e você está usando um servidor (Live Server).";
+        }
+    }
+
+    // --- EVENT LISTENERS (Segurança contra "not defined") ---
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+        document.getElementById('addBtn').addEventListener('click', addNumber);
+        document.getElementById('numInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') addNumber(); });
+
+        // Recuperar tema
+        if (localStorage.getItem('mega-theme') === 'light') toggleTheme();
+        
+        loadCSV();
     });
 </script>
-
 </body>
 </html>
