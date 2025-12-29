@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Conferidor Mega Sena (CSV Auto)</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --quadra: #ff9800; /* Laranja */
+            --quina: #9c27b0; /* Roxo */
+            --sena: #00e676; /* Verde */
+            --ball-bg: #333;
+            --ball-match: #fdd835; /* Dourado */
+            --ball-match-text: #000;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px;
+        }
+
+        /* --- Header Fixo --- */
+        header {
+            background-color: #2c2c2c;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            border-bottom: 1px solid #444;
+        }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.1rem; text-align: center; color: #fff; }
+
+        .input-group { display: flex; gap: 10px; }
+
+        input[type="number"] {
+            flex: 1;
+            padding: 12px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background: #333;
+            color: white;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="number"]:focus { border-color: var(--sena); }
+
+        button.add-btn {
+            background-color: var(--sena);
+            color: #000;
+            border: none;
+            padding: 0 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* --- Bolas Sorteadas --- */
+        #drawn-numbers-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+            min-height: 40px;
+        }
+
+        .drawn-ball {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: var(--ball-match);
+            color: var(--ball-match-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 0 10px rgba(253, 216, 53, 0.4);
+            cursor: pointer;
+            animation: popIn 0.3s ease;
+        }
+
+        /* --- Status Bar --- */
+        .stats-bar {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 8px;
+            padding: 5px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+
+        /* --- Lista de Jogos --- */
+        #games-list {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #333; /* Cor padrão sem prêmio */
+            transition: all 0.3s ease;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .game-numbers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .ball {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--ball-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+
+        .ball.hit {
+            background-color: var(--ball-match);
+            color: var(--ball-match-text);
+            font-weight: bold;
+            transform: scale(1.15);
+        }
+
+        /* --- Cores de Premiação --- */
+        .game-card.win-4 { border-left-color: var(--quadra); background-color: rgba(255, 152, 0, 0.08); }
+        .game-card.win-5 { border-left-color: var(--quina); background-color: rgba(156, 39, 176, 0.12); }
+        .game-card.win-6 { border-left-color: var(--sena); background-color: rgba(0, 230, 118, 0.15); }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: none;
+        }
+        .win-4 .badge { display: inline; background: var(--quadra); }
+        .win-5 .badge { display: inline; background: var(--quina); }
+        .win-6 .badge { display: inline; background: var(--sena); }
+
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        
+        /* Erro */
+        #error-msg {
+            color: #ff5252;
+            text-align: center;
+            padding: 20px;
+            display: none;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Conferidor Ao Vivo</h1>
+    
+    <div class="input-group">
+        <input type="number" id="numInput" placeholder="Nº Sorteado" inputmode="numeric" pattern="[0-9]*">
+        <button class="add-btn" onclick="addNumber()">+</button>
+    </div>
+    
+    <div id="drawn-numbers-container"></div>
+    <div class="stats-bar" id="stats-info">Carregando jogos.csv...</div>
+</header>
+
+<main>
+    <div id="error-msg"></div>
+    <div id="games-list"></div>
+</main>
+
+<script>
+    let games = []; 
+    let drawnNumbers = []; 
+
+    // Referências
+    const gamesListEl = document.getElementById('games-list');
+    const drawnContainer = document.getElementById('drawn-numbers-container');
+    const numInput = document.getElementById('numInput');
+    const statsInfo = document.getElementById('stats-info');
+    const errorMsg = document.getElementById('error-msg');
+
+    // Inicialização: Tenta carregar o arquivo ao abrir a página
+    window.onload = loadCSV;
+
+    function loadCSV() {
+        // Cache busting para garantir que leia a versão nova se você trocar o arquivo
+        fetch('./jogos.csv?t=' + new Date().getTime())
+            .then(response => {
+                if (!response.ok) throw new Error("Arquivo não encontrado (404)");
+                return response.text();
+            })
+            .then(text => parseCSV(text))
+            .catch(err => {
+                console.error(err);
+                statsInfo.textContent = "Erro ao carregar.";
+                errorMsg.style.display = 'block';
+                errorMsg.innerHTML = `
+                    <strong>Não foi possível ler "jogos.csv".</strong><br><br>
+                    Motivos prováveis:<br>
+                    1. O arquivo não está na mesma pasta.<br>
+                    2. Você abriu o HTML direto (file://). Navegadores bloqueiam isso por segurança.<br>
+                    <br><em>Solução: Use um servidor local ou hospede no GitHub Pages.</em>
+                `;
+            });
+    }
+
+    function parseCSV(text) {
+        const lines = text.split('\n');
+        games = [];
+
+        // Verifica se tem cabeçalho
+        let startIndex = 0;
+        if (lines[0] && lines[0].toLowerCase().includes('jogador')) {
+            startIndex = 1;
+        }
+
+        for (let i = startIndex; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+
+            const cols = line.split(',');
+            
+            // Lógica dinâmica: Pega do índice 2 até o fim da linha
+            // Assim aceita N6, N7, N8... automaticamente
+            const numbers = cols.slice(2)
+                .map(n => parseInt(n.trim()))
+                .filter(n => !isNaN(n)); // Remove vazios ou lixo
+
+            if (numbers.length > 0) {
+                games.push({
+                    id: i,
+                    player: cols[0].trim(), // Nome
+                    count: cols[1].trim(),  // Qtd Dezenas
+                    numbers: numbers,
+                    hits: 0
+                });
+            }
+        }
+
+        statsInfo.textContent = `${games.length} jogos carregados. Aguardando sorteio...`;
+        errorMsg.style.display = 'none';
+        renderGames();
+    }
+
+    function addNumber() {
+        const val = parseInt(numInput.value);
+        if (!val || isNaN(val)) return;
+
+        // Validações básicas
+        if (val < 1 || val > 60) { alert("Apenas 1 a 60."); return; }
+        if (drawnNumbers.includes(val)) { alert("Já saiu este número."); numInput.value=''; return; }
+
+        drawnNumbers.push(val);
+        numInput.value = '';
+        numInput.focus(); // Mantém teclado aberto se possível
+
+        renderDrawnNumbers();
+        checkWinners();
+    }
+
+    function removeNumber(val) {
+        if(confirm(`Remover o número ${val}?`)) {
+            drawnNumbers = drawnNumbers.filter(n => n !== val);
+            renderDrawnNumbers();
+            checkWinners();
+        }
+    }
+
+    function renderDrawnNumbers() {
+        drawnContainer.innerHTML = '';
+        drawnNumbers.forEach(num => {
+            const el = document.createElement('div');
+            el.className = 'drawn-ball';
+            el.textContent = num < 10 ? '0'+num : num;
+            el.onclick = () => removeNumber(num);
+            drawnContainer.appendChild(el);
+        });
+    }
+
+    function checkWinners() {
+        // Conta acertos
+        games.forEach(game => {
+            const matches = game.numbers.filter(n => drawnNumbers.includes(n));
+            game.hits = matches.length;
+        });
+
+        // Ordenação inteligente:
+        // 1. Quem tem mais acertos
+        // 2. Desempate pelo nome do jogador (opcional, para estabilidade)
+        games.sort((a, b) => b.hits - a.hits);
+
+        // Atualiza Estatísticas
+        const w6 = games.filter(g => g.hits >= 6).length;
+        const w5 = games.filter(g => g.hits === 5).length;
+        const w4 = games.filter(g => g.hits === 4).length;
+
+        let status = `${games.length} Jogos.`;
+        if(w6) status += ` SENA: ${w6} 🏆`;
+        else if(w5) status += ` Quina: ${w5}`;
+        else if(w4) status += ` Quadra: ${w4}`;
+        else status += ` Maior acerto: ${games[0]?.hits || 0}`;
+
+        statsInfo.textContent = status;
+        renderGames();
+    }
+
+    function renderGames() {
+        gamesListEl.innerHTML = '';
+
+        games.forEach(game => {
+            // Define classes de prêmio
+            let cssClass = '';
+            let badgeTxt = '';
+            
+            if (game.hits >= 6) { cssClass = 'win-6'; badgeTxt = 'SENA!'; }
+            else if (game.hits === 5) { cssClass = 'win-5'; badgeTxt = 'QUINA'; }
+            else if (game.hits === 4) { cssClass = 'win-4'; badgeTxt = 'QUADRA'; }
+
+            // Gera HTML das bolas do jogo
+            let ballsHtml = game.numbers.map(n => {
+                const isHit = drawnNumbers.includes(n);
+                const val = n < 10 ? '0'+n : n;
+                return `<div class="ball ${isHit ? 'hit' : ''}">${val}</div>`;
+            }).join('');
+
+            const html = `
+                <div class="game-card ${cssClass}">
+                    <div class="game-header">
+                        <strong>${game.player}</strong>
+                        <span class="badge">${badgeTxt}</span>
+                        <span>Acertos: <strong>${game.hits}</strong></span>
+                    </div>
+                    <div class="game-numbers">${ballsHtml}</div>
+                </div>
+            `;
+            gamesListEl.insertAdjacentHTML('beforeend', html);
+        });
+    }
+
+    // Atalho Enter
+    numInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            addNumber();
+        }
+    });
+</script>
+
+</body>
+</html>
