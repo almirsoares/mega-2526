@@ -387,4 +387,70 @@
         });
     }
 
-    function checkWinners()
+    function checkWinners() {
+        // Conta acertos
+        games.forEach(game => {
+            const matches = game.numbers.filter(n => drawnNumbers.includes(n));
+            game.hits = matches.length;
+        });
+
+        // Ordena: Mais acertos primeiro
+        games.sort((a, b) => b.hits - a.hits);
+
+        // Stats
+        const w6 = games.filter(g => g.hits >= 6).length;
+        const w5 = games.filter(g => g.hits === 5).length;
+        const w4 = games.filter(g => g.hits === 4).length;
+
+        let status = '';
+        if(w6) status += ` SENA: ${w6} 🏆`;
+        else if(w5) status += ` QUINA: ${w5} 🔥`;
+        else if(w4) status += ` QUADRA: ${w4} 👍`;
+        else status = `Jogos: ${games.length} | Sorteados: ${drawnNumbers.length}`;
+
+        statsInfo.textContent = status;
+        renderGames();
+    }
+
+    function renderGames() {
+        gamesListEl.innerHTML = '';
+
+        games.forEach(game => {
+            let cssClass = '';
+            let badgeTxt = '';
+            
+            if (game.hits >= 6) { cssClass = 'win-6'; badgeTxt = 'SENA'; }
+            else if (game.hits === 5) { cssClass = 'win-5'; badgeTxt = 'QUINA'; }
+            else if (game.hits === 4) { cssClass = 'win-4'; badgeTxt = 'QUADRA'; }
+
+            let ballsHtml = game.numbers.map(n => {
+                const isHit = drawnNumbers.includes(n);
+                const val = n < 10 ? '0'+n : n;
+                return `<div class="ball ${isHit ? 'hit' : ''}">${val}</div>`;
+            }).join('');
+
+            // Aqui substituimos o nome pelo ID sequencial
+            const html = `
+                <div class="game-card ${cssClass}">
+                    <div class="game-header">
+                        <strong>Jogo #${game.originalIndex}</strong>
+                        <span class="badge">${badgeTxt}</span>
+                        <span>Acertos: <strong>${game.hits}</strong></span>
+                    </div>
+                    <div class="game-numbers">${ballsHtml}</div>
+                </div>
+            `;
+            gamesListEl.insertAdjacentHTML('beforeend', html);
+        });
+    }
+
+    numInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            addNumber();
+        }
+    });
+</script>
+
+</body>
+</html>
