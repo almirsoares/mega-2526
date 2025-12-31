@@ -111,6 +111,20 @@
             cursor: pointer;
         }
 
+        /* --- Estatísticas --- */
+        .frequency-section {
+            background: var(--card-bg);
+            margin: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border-color);
+        }
+        .freq-title { font-weight: bold; margin-bottom: 8px; display: block; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+        .freq-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .freq-item { color: var(--text-secondary); }
+        .freq-item b { color: var(--sena); }
+
         .stats-bar { text-align: center; font-size: 0.85rem; color: var(--text-secondary); margin-top: 10px; }
 
         #games-list { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
@@ -156,6 +170,7 @@
         .win-6 .badge { display: inline; background: var(--sena); }
 
         #error-msg { color: #ff5252; padding: 20px; text-align: center; display: none; }
+        #alert-box { background: #ff980022; color: #ff9800; padding: 10px; margin: 15px; border-radius: 8px; border: 1px solid #ff9800; display: none; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -177,15 +192,20 @@
 
 <main>
     <div id="error-msg"></div>
+    <div id="alert-box"></div>
+
+    <section class="frequency-section" id="freq-section" style="display:none;">
+        <span class="freq-title">Números mais jogados (Top 10):</span>
+        <div class="freq-list" id="freq-list"></div>
+    </section>
+
     <div id="games-list"></div>
 </main>
 
 <script>
-    // Variáveis Globais
     let games = [];
     let drawnNumbers = [];
 
-    // --- FUNÇÕES DE INTERFACE ---
     function toggleTheme() {
         document.body.classList.toggle('light-theme');
         const isLight = document.body.classList.contains('light-theme');
@@ -206,6 +226,30 @@
             };
             container.appendChild(el);
         });
+    }
+
+    // --- NOVA FUNÇÃO: FREQUÊNCIA ---
+    function updateFrequency() {
+        const freqMap = {};
+        games.forEach(game => {
+            game.numbers.forEach(n => {
+                freqMap[n] = (freqMap[n] || 0) + 1;
+            });
+        });
+
+        const sortedFreq = Object.entries(freqMap)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
+        const freqContainer = document.getElementById('freq-list');
+        const freqSection = document.getElementById('freq-section');
+        
+        if (sortedFreq.length > 0) {
+            freqSection.style.display = 'block';
+            freqContainer.innerHTML = sortedFreq.map(([num, count]) => 
+                `<span class="freq-item">Nº <b>${num < 10 ? '0'+num : num}</b>: ${count}x</span>`
+            ).join('');
+        }
     }
 
     function renderGames() {
@@ -263,7 +307,6 @@
         input.focus();
     }
 
-    // --- CARREGAMENTO DO CSV ---
     async function loadCSV() {
         try {
             const resp = await fetch('./jogos.csv?v=' + Date.now());
@@ -274,32 +317,53 @@
             let startIndex = (lines[0].toLowerCase().includes('jogador')) ? 1 : 0;
             
             games = [];
+            const seenGames = {};
+            const duplicates = [];
+
             for (let i = startIndex; i < lines.length; i++) {
                 const cols = lines[i].split(',');
                 if (cols.length < 3) continue;
                 
-                const nums = cols.slice(2).map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                const nums = cols.slice(2)
+                    .map(n => parseInt(n.trim()))
+                    .filter(n => !isNaN(n))
+                    .sort((a, b) => a - b); // Ordena para comparar duplicados corretamente
+
                 if (nums.length > 0) {
-                    games.push({ id: games.length + 1, numbers: nums, hits: 0 });
+                    const gameKey = nums.join('-');
+                    const gameId = games.length + 1;
+                    
+                    if (seenGames[gameKey]) {
+                        duplicates.push(`Jogo #${gameId} é igual ao Jogo #${seenGames[gameKey]}`);
+                    } else {
+                        seenGames[gameKey] = gameId;
+                    }
+
+                    games.push({ id: gameId, numbers: nums, hits: 0 });
                 }
             }
+
+            // --- ALERTA DE DUPLICADOS ---
+            if (duplicates.length > 0) {
+                const alertBox = document.getElementById('alert-box');
+                alertBox.style.display = 'block';
+                alertBox.innerHTML = `<strong>Atenção: Jogos Repetidos Detectados!</strong><br>${duplicates.slice(0, 3).join('<br>')}${duplicates.length > 3 ? '<br>...' : ''}`;
+            }
+
             document.getElementById('stats-info').textContent = `Pronto: ${games.length} jogos.`;
+            updateFrequency();
             renderGames();
         } catch (e) {
             document.getElementById('error-msg').style.display = 'block';
-            document.getElementById('error-msg').innerHTML = "<b>Erro ao carregar jogos.csv</b><br>Certifique-se que o arquivo existe e você está usando um servidor (Live Server).";
+            document.getElementById('error-msg').innerHTML = "<b>Erro ao carregar jogos.csv</b>";
         }
     }
 
-    // --- EVENT LISTENERS (Segurança contra "not defined") ---
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
         document.getElementById('addBtn').addEventListener('click', addNumber);
         document.getElementById('numInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') addNumber(); });
-
-        // Recuperar tema
         if (localStorage.getItem('mega-theme') === 'light') toggleTheme();
-        
         loadCSV();
     });
 </script>
